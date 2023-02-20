@@ -1,7 +1,6 @@
 const admin = require('firebase-admin');
 const serviceAccount = require("../serviceAccKey.json");
-
-const { signInWithEmailAndPassword } = require("firebase/auth");
+const { signInWithEmailAndPassword, getAuth } = require("firebase/auth");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
