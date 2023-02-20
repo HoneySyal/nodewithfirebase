@@ -1,6 +1,5 @@
 const admin = require('firebase-admin');
-const serviceAccount = require("../serviceAccKey.json");
-const bcrypt = require('bcryptjs')
+const serviceAccount = require("../serviceAccKey.json")
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -24,15 +23,14 @@ exports.createUser = async (req, res) => {
   const name = req.body.name;
   const phone = req.body.phone;
   const email = req.body.email;
-  const salt = await bcrypt.genSalt(10);
-  const hash = await bcrypt.hash(req.body.password, salt);
+  const password = req.body.password;
   try {
-    admin.auth().createUser({
+    await admin.auth().createUser({
       Name: name,
       email: email,
       emailVerified: false,
       phone: phone,
-      password: hash,
+      password: password,
       disabled: false
     })
     res.json({ message: 'User Created' })
@@ -64,6 +62,26 @@ exports.updateUser = async (req, res) => {
 };
 
 exports.deleteUser = async (req, res) => {
-  admin.auth().deleteUser(req.params.id)
+  await admin.auth().deleteUser(req.params.id)
   res.json({ message: 'User deleted' })
 };
+
+exports.auth = async (req, res) => {
+  try {
+    admin.auth().ch
+  } catch (error) {
+    res.json({ error: error });
+  }
+};
+
+exports.login = async (req, res) => {
+  try {
+    const email = req.body.email;
+    const password = req.body.password;
+    await admin.auth().signInWithEmailAndPassword(email, password);
+  } catch (error) {
+    res.json({ error: error });
+  }
+
+};
+
