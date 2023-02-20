@@ -1,9 +1,12 @@
 const admin = require('firebase-admin');
-const serviceAccount = require("../serviceAccKey.json")
+const serviceAccount = require("../serviceAccKey.json");
+
+const { signInWithEmailAndPassword } = require("firebase/auth");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
+
 
 exports.listUser = async (req, res) => {
   const usersResult = await admin.auth().listUsers(1000)
@@ -66,22 +69,26 @@ exports.deleteUser = async (req, res) => {
   res.json({ message: 'User deleted' })
 };
 
-exports.auth = async (req, res) => {
-  try {
-    admin.auth().ch
-  } catch (error) {
-    res.json({ error: error });
-  }
-};
-
-exports.login = async (req, res) => {
-  try {
-    const email = req.body.email;
-    const password = req.body.password;
-    await admin.auth().signInWithEmailAndPassword(email, password);
-  } catch (error) {
-    res.json({ error: error });
-  }
-
+exports.login = (req, res) => {
+  const auth = getAuth();
+  const email = req.body.email;
+  const password = req.body.password;
+  signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      // Signed in 
+      const user = userCredential.user;
+      res.json({
+        message: 'user Logged in',
+        data: user
+      });
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      res.json({
+        errorCode: errorCode,
+        errorMessage: errorMessage
+      });
+    })
 };
 
